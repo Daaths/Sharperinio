@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using LeagueSharp;
 using LeagueSharp.Common;
-using System.Drawing;
 using SharpDX;
-using LX_Orbwalker;
 using Color = System.Drawing.Color;
 
 namespace PerfectWard
@@ -36,7 +31,8 @@ namespace PerfectWard
 
             Menu = new Menu("PerfectWard", "menu", true);
             Menu.AddItem(new MenuItem("on", "Enabled").SetValue(true));
-            Menu.AddItem(new MenuItem("on1", "Draw when Im near").SetValue(false));
+            Menu.AddItem(new MenuItem("on1", "Draw only if near").SetValue(true));
+            Menu.AddItem(new MenuItem("on2", "Drawing range").SetValue(new Slider(1500, 600, 2000)));
             Menu.AddToMainMenu();
 
             standingCoords = new List<Vector3>();
@@ -54,10 +50,10 @@ namespace PerfectWard
 
             if (Menu.Item("on1").GetValue<bool>())
             {
-                foreach (var StandingCoords in standingCoords.Where(StandingCoords => Vector3.Distance(Player.ServerPosition, StandingCoords) <= 1500))
+                foreach (var StandingCoords in standingCoords.Where(StandingCoords => Vector3.Distance(Player.ServerPosition, StandingCoords) <= Menu.Item("on2").GetValue<Slider>().Value))
                     Utility.DrawCircle(StandingCoords, 50f, Color.Red);
 
-                foreach (var PlaceCoords in placeCoords.Where(PlaceCoords => Vector3.Distance(Player.ServerPosition, PlaceCoords) <= 1500))
+                foreach (var PlaceCoords in placeCoords.Where(PlaceCoords => Vector3.Distance(Player.ServerPosition, PlaceCoords) <= Menu.Item("on2").GetValue<Slider>().Value))
                     Utility.DrawCircle(PlaceCoords, 15f, Color.Blue);
             }
             else

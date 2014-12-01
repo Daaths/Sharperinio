@@ -10,3 +10,6 @@ C:\Users\Thoki\documents\visual studio 2013\Projects\PerfectWard\PerfectWard\bin
 C:\Users\Thoki\documents\visual studio 2013\Projects\PerfectWard\PerfectWard\obj\Debug\PerfectWard.csprojResolveAssemblyReference.cache
 C:\Users\Thoki\documents\visual studio 2013\Projects\PerfectWard\PerfectWard\obj\Debug\PerfectWard.exe
 C:\Users\Thoki\documents\visual studio 2013\Projects\PerfectWard\PerfectWard\obj\Debug\PerfectWard.pdb
+E:\Davide\Documenti\GitHub\Sharperinio\PerfectWard\bin\Release\PerfectWard.exe.config
+E:\Davide\Documenti\GitHub\Sharperinio\PerfectWard\obj\Debug\PerfectWard.exe
+E:\Davide\Documenti\GitHub\Sharperinio\PerfectWard\obj\Debug\PerfectWard.pdb
