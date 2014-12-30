@@ -3,9 +3,12 @@ C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEve
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\TheHatinEvelynn.pdb
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\LeagueSharp.Common.dll
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\LeagueSharp.dll
-C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\LX-Orbwalker.dll
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.dll
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.Toolkit.dll
+C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.Toolkit.Graphics.dll
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\LeagueSharp.xml
+C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.Toolkit.xml
+C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\bin\Release\SharpDX.Toolkit.Graphics.xml
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\obj\Debug\TheHatinEvelynn.exe
 C:\Users\Thoki\Documents\Visual Studio 2013\Projects\TheHatinEvelynn\TheHatinEvelynn\obj\Debug\TheHatinEvelynn.pdb

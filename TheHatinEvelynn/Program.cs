@@ -18,6 +18,7 @@ namespace TheHatinEvelynn
         public static Orbwalking.Orbwalker Orbwalker;
         public static Dictionary<string, int> numSkins = new Dictionary<string, int>();
         public static int currSkinId = 0;
+        private static int kappa;
         public static string WelcomeMsg = ("<font color = '#6600cc'>TheHatin' Evelynn </font><font color='#FFFFFF'>by Da'ath.</font> <font color = '#66ff33'> ~~ LOADED ~~</font> ");
         private static Obj_AI_Hero Player;
         // Spells
@@ -92,7 +93,7 @@ namespace TheHatinEvelynn
             Menu = new Menu(ChampionName, ChampionName, true);
 
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
-            SimpleTs.AddToMenu(targetSelectorMenu);
+            TargetSelector.AddToMenu(targetSelectorMenu);
             Menu.AddSubMenu(targetSelectorMenu);
 
             Menu.AddSubMenu(new Menu("Orbwalker Menu", "Orbwalker Menu"));
@@ -108,6 +109,13 @@ namespace TheHatinEvelynn
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseItemsCombo", "Use Items").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseIgniteCombo", "Use Ignite").SetValue(true));
+            var kappaHD = Menu.SubMenu("Combo").AddItem(new MenuItem("rif", "R if > enemys").SetValue(new Slider(2, 1, 5)));
+            kappaHD.ValueChanged += delegate(object sender, OnValueChangeEventArgs EventArgs)
+            {
+                Game.PrintChat("Value changed, press F5, to reload.");
+            };
+            kappa = Menu.Item("rif").GetValue<Slider>().Value;
+            Menu.SubMenu("Combo").AddItem(new MenuItem("rif2", "R if " + kappa + " enemys").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Active").SetValue(new KeyBind(32, KeyBindType.Press)));
             #endregion
 
@@ -236,33 +244,32 @@ namespace TheHatinEvelynn
 
         private static void Combo()
         {
-            var target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
             if (target != null)
             {
                
-                if (ObjectManager.Player.Distance(target) <= DFG.Range && DFG.IsReady() && Menu.Item("UseDFGItems").GetValue<bool>() && target.Health < GetComboDamage(target) && target.IsValidTarget(DFG.Range))
+                if (ObjectManager.Player.Distance(target, true) <= DFG.Range && DFG.IsReady() && Menu.Item("UseDFGItems").GetValue<bool>() && target.Health < GetComboDamage(target) && target.IsValidTarget(DFG.Range))
                     DFG.Cast(target);
-                if (ObjectManager.Player.Distance(target) <= Cutlass.Range && Cutlass.IsReady() && Menu.Item("UseCutlassItems").GetValue<bool>() && target.IsValidTarget(Cutlass.Range))
+                if (ObjectManager.Player.Distance(target, true) <= Cutlass.Range && Cutlass.IsReady() && Menu.Item("UseCutlassItems").GetValue<bool>() && target.IsValidTarget(Cutlass.Range))
                     Cutlass.Cast(target);
-                if (ObjectManager.Player.Distance(target) <= BotRK.Range && BotRK.IsReady() && Menu.Item("UseBotRKItems").GetValue<bool>() && target.IsValidTarget(BotRK.Range)) 
+                if (ObjectManager.Player.Distance(target, true) <= BotRK.Range && BotRK.IsReady() && Menu.Item("UseBotRKItems").GetValue<bool>() && target.IsValidTarget(BotRK.Range)) 
                     BotRK.Cast(target);
-                if (ObjectManager.Player.Distance(target) <= HexGunBlade.Range && HexGunBlade.IsReady() && Menu.Item("UseHexGunBladeItems").GetValue<bool>() && target.IsValidTarget(HexGunBlade.Range))
+                if (ObjectManager.Player.Distance(target, true) <= HexGunBlade.Range && HexGunBlade.IsReady() && Menu.Item("UseHexGunBladeItems").GetValue<bool>() && target.IsValidTarget(HexGunBlade.Range))
                     HexGunBlade.Cast(target);
 
 
-                if (ObjectManager.Player.Distance(target) < Q.Range && Q.IsReady() && Menu.Item("UseQCombo").GetValue<bool>() && target.IsValidTarget(Q.Range))
-                    Q.Cast(Menu.Item("UsePackets").GetValue<bool>()); 
-                if (ObjectManager.Player.Distance(target) < E.Range && E.IsReady() && Menu.Item("UseECombo").GetValue<bool>() && target.IsValidTarget(E.Range))
+                if (ObjectManager.Player.Distance(target, true) < Q.Range && Q.IsReady() && Menu.Item("UseQCombo").GetValue<bool>() && target.IsValidTarget(Q.Range))
+                    Q.Cast(Menu.Item("UsePackets").GetValue<bool>());
+                if (ObjectManager.Player.Distance(target, true) < E.Range && E.IsReady() && Menu.Item("UseECombo").GetValue<bool>() && target.IsValidTarget(E.Range))
                     E.CastOnUnit(target, Menu.Item("UsePackets").GetValue<bool>());
-                if (ObjectManager.Player.Distance(target) < R.Range && R.IsReady() && target.Health < GetComboDamage(target) && Menu.Item("UseRCombo").GetValue<bool>() && target.IsValidTarget(R.Range))
-                    R.Cast(target, Menu.Item("UsePackets").GetValue<bool>(), true);
-                if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Menu.Item("UseIgniteCombo").GetValue<bool>())
+                if (ObjectManager.Player.Distance(target, true) < R.Range && R.IsReady() && target.Health < GetComboDamage(target) && Menu.Item("UseRCombo").GetValue<bool>() && target.IsValidTarget(R.Range))
+                    R.CastIfHitchanceEquals(target, HitChance.High, Menu.Item("UsePackets").GetValue<bool>());
+                if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Menu.Item("UseIgniteCombo").GetValue<bool>())
                     if (target.Health < GetComboDamage(target))
-                      Player.SummonerSpellbook.CastSpell(IgniteSlot, target);
-                
-
-
+                      Player.Spellbook.CastSpell(IgniteSlot, target);
+                if (Menu.Item("rif2").GetValue<bool>() && R.IsReady())
+                    R.CastIfWillHit(target, kappa, Menu.Item("UsePackets").GetValue<bool>());
             }
 
         }
@@ -316,9 +323,9 @@ namespace TheHatinEvelynn
                     else if (!Menu.Item("manaJActive").GetValue<bool>())
                         E.CastOnUnit(minions[0]);
                 }
-                if (Menu.Item("UseSmite").GetValue<bool>() && SmiteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
+                if (Menu.Item("UseSmite").GetValue<bool>() && SmiteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
                     if(mob.Health < smitedamage)
-                        Player.SummonerSpellbook.CastSpell(SmiteSlot, mob);
+                        Player.Spellbook.CastSpell(SmiteSlot, mob);
 
             }
         }
@@ -385,7 +392,7 @@ namespace TheHatinEvelynn
                 damage += Player.GetSpellDamage(enemy, SpellSlot.R);
             if(DFG.IsReady())
                 damage = damage * 1.2;
-            if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
+            if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
                 damage += ObjectManager.Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
 
            
