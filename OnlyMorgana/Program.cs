@@ -109,7 +109,7 @@ namespace OnlyMorgana
                     {
                         foreach (var spell in SpellList.CCList)
                         {
-                           Game.PrintChat(args.SData.Name);
+                           //Game.PrintChat(args.SData.Name);
                             if (args.SData.Name == spell.SDataName)
                             {
                                 if (Menu.Item(spell.SDataName).GetValue<bool>())
