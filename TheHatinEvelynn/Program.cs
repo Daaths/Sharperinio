@@ -110,9 +110,14 @@ namespace TheHatinEvelynn
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseItemsCombo", "Use Items").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("UseIgniteCombo", "Use Ignite").SetValue(true));
             var kappaHD = Menu.SubMenu("Combo").AddItem(new MenuItem("rif", "R if > enemys").SetValue(new Slider(2, 1, 5)));
+            int lastTick = Environment.TickCount;
             kappaHD.ValueChanged += delegate(object sender, OnValueChangeEventArgs EventArgs)
             {
-                Game.PrintChat("Value changed, press F5, to reload.");
+                if(Environment.TickCount > lastTick)
+                    {
+                        Game.PrintChat("Value changed, press F5 to reload.");
+                        lastTick = Environment.TickCount + 5000;
+                    }
             };
             kappa = Menu.Item("rif").GetValue<Slider>().Value;
             Menu.SubMenu("Combo").AddItem(new MenuItem("rif2", "R if " + kappa + " enemys").SetValue(true));
