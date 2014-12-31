@@ -59,6 +59,9 @@ namespace OnlyMorgana
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.IsDead)
+                return;
+
             if(Menu.Item("HarassActive").GetValue<KeyBind>().Active)
                 Harass();
             if (Menu.Item("ComboActive").GetValue<KeyBind>().Active)
@@ -78,7 +81,7 @@ namespace OnlyMorgana
 
             if (args.SData.Name == "SoulShackles" && sender.IsMe)
             {
-                Game.PrintChat("kappa");
+                //Game.PrintChat("kappa");
                 kappaSensei = Environment.TickCount + 5000;
             }
 
@@ -105,11 +108,11 @@ namespace OnlyMorgana
                 var champList = ObjectManager.Get<Obj_AI_Hero>().Where(f => f.IsAlly && !f.IsDead).OrderBy(f => f.Distance(args.End));
                 if (Menu.Item("enable").GetValue<bool>())
                 {
+                    //Game.PrintChat(args.SData.Name);
                     foreach (var champ in champList)
                     {
                         foreach (var spell in SpellList.CCList)
                         {
-                           //Game.PrintChat(args.SData.Name);
                             if (args.SData.Name == spell.SDataName)
                             {
                                 if (Menu.Item(spell.SDataName).GetValue<bool>())
@@ -176,14 +179,14 @@ namespace OnlyMorgana
                                         case Skilltype.Circle:
                                             if (champ.IsMe)
                                             {
-                                                if (champ.Distance(args.End) < 250f)
+                                                if (champ.Distance(args.End) < 300f)
                                                 {
                                                     E.CastOnUnit(champ, Packets());
                                                 }
                                             }
                                             else if (Menu.Item("useOn" + champ.BaseSkinName).GetValue<bool>())
                                             {
-                                                if (champ.Distance(args.End) < 250f)
+                                                if (champ.Distance(args.End) < 300f)
                                                 {
                                                     if (Player.Distance(champ, true) < E.Range)
                                                     {
@@ -238,7 +241,7 @@ namespace OnlyMorgana
 
             //Game.PrintChat("COMBO");
 
-            if (Menu.Item("qCombo").GetValue<bool>() && Q.IsReady() && target.IsValidTarget(Q.Range))
+            if (Menu.Item("qCombo").GetValue<bool>() && Q.IsReady() && target.IsValidTarget(Q.Range, true, Player.ServerPosition) && Q.GetPrediction(target).Hitchance >= GetHitChance())
             {
                 Q.CastIfHitchanceEquals(target, GetHitChance(), Packets());
                 //Game.PrintChat("q COMBO !!!!!");
@@ -251,13 +254,32 @@ namespace OnlyMorgana
                         || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Taunt))
                             W.Cast(target.Position, Packets());
                 }
-                else
+                else if(W.GetPrediction(target, true).Hitchance >= HitChance.High)
                 {
                     W.CastIfHitchanceEquals(target, HitChance.High, Packets());
                 }
             }
             if (Menu.Item("rCombo").GetValue<bool>() && R.IsReady() && target.IsValidTarget(R.Range))
             {
+                if(Q.IsReady() && Q.GetPrediction(target).Hitchance >= GetHitChance())
+                {
+                    Q.CastIfHitchanceEquals(target, GetHitChance(), Packets());
+                    return;
+                }
+                if(target.Health <= Player.GetAutoAttackDamage(target) * 2)
+                {
+                    return;
+                }
+                if (W.IsReady() && Player.GetSpellDamage(target, SpellSlot.W) * 2 >= target.Health)
+                {
+                    W.CastIfHitchanceEquals(target, HitChance.Medium, Packets());
+                    return;
+                }
+                if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) >= target.Health)
+                {
+                    Player.Spellbook.CastSpell(IgniteSlot, target);
+                    return;
+                }
                 if(GetComboDamage(target) > target.Health)
                 {
                     R.Cast(Packets());
@@ -279,19 +301,19 @@ namespace OnlyMorgana
 
         private static void SmartKS()
         {
-            var enemies1 = ObjectManager.Get<Obj_AI_Hero>().Where(f => !f.IsAlly && !f.IsDead && f.IsValidTarget(Q.Range));
+            var enemies1 = ObjectManager.Get<Obj_AI_Hero>().Where(f => !f.IsAlly && !f.IsDead && f.IsValidTarget(Q.Range, true, Player.ServerPosition));
             if (enemies1 == null) return;
 
             foreach (var target in enemies1)
             {
-                if (Player.GetSpellDamage(target, SpellSlot.Q) > target.Health + 150 && Q.IsReady())
+                /*if (Player.GetSpellDamage(target, SpellSlot.Q) > target.Health + 150 && Q.IsReady() && Q.GetPrediction(target).Hitchance >= HitChance.Medium)
                 {
-                    Q.CastIfHitchanceEquals(target, HitChance.High, Packets());
-                    //Game.PrintChat("Q KS" + target.BaseSkinName);
-                }
-                if((Player.GetSpellDamage(target, SpellSlot.W) * 3) > target.Health + 50 && target.IsValidTarget(W.Range) && W.IsReady())
+                    Q.CastIfHitchanceEquals(target, HitChance.Medium, Packets());
+                    Game.PrintChat("Q KS" + target.BaseSkinName);
+                }*/
+                if(Player.GetSpellDamage(target, SpellSlot.W) * 3 >= target.Health + 50 && target.IsValidTarget(W.Range) && W.IsReady() && W.GetPrediction(target, true).Hitchance >= HitChance.Medium)
                 {
-                    W.CastIfHitchanceEquals(target, HitChance.High, Packets());
+                    W.CastIfHitchanceEquals(target, HitChance.Medium, Packets());
                     //Game.PrintChat("W KS " + target.BaseSkinName);
                 }
             }
@@ -303,16 +325,23 @@ namespace OnlyMorgana
                 if (Player.Mana < GetPlayerMana(Menu.Item("mpHarass").GetValue<Slider>().Value))
                     return;
 
-            var enemies2 = ObjectManager.Get<Obj_AI_Hero>().Where(f => !f.IsAlly && !f.IsDead && f.IsValidTarget(Q.Range));
-            if (enemies2 == null) return;
+            if (Menu.Item("ComboActive").GetValue<KeyBind>().Active)
+                return;
 
-            foreach(var target in enemies2)
+            var enemies2 = ObjectManager.Get<Obj_AI_Hero>().Where(f => !f.IsAlly && !f.IsDead && f.IsValidTarget(Q.Range, true, Player.ServerPosition) && Q.GetPrediction(f).Hitchance >= HitChance.VeryHigh && Player.Distance(f, false) < Q.Range);
+            if (enemies2 == null) return;
+            var enemies3 = ObjectManager.Get<Obj_AI_Hero>().Where(f => !f.IsAlly && !f.IsDead && Player.Distance(f, false) < W.Range);
+
+            foreach (var target in enemies2)
             {
                 if (Menu.Item("qHarass").GetValue<bool>() && Q.IsReady() && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh)
                 {
+                    Game.PrintChat("q harass");
                     Q.CastIfHitchanceEquals(target, HitChance.VeryHigh, Packets());
-                    //Game.PrintChat("q harass");
                 }
+            }
+            foreach (var target in enemies3)
+            {
                 if (Menu.Item("wHarass").GetValue<bool>() && target.IsValidTarget(W.Range) && W.IsReady())
                 {
                     if (target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Sleep) || target.HasBuffOfType(BuffType.Snare)
@@ -322,7 +351,6 @@ namespace OnlyMorgana
                         //Game.PrintChat("w harass");
                     }
                 }
-
             }
         }
 
@@ -480,7 +508,7 @@ namespace OnlyMorgana
                 };
                 Combo.AddItem(new MenuItem("rifComboActive", "R if " + kappa + " enemys").SetValue(true));
                 Combo.AddItem(new MenuItem("zhonya", "Use Zhonya").SetValue(true));   
-                Combo.AddItem(new MenuItem("hpZhonya", "Zhonya HP").SetValue(new Slider(70, 1, 100)));              
+                Combo.AddItem(new MenuItem("hpZhonya", "Zhonya HP").SetValue(new Slider(80, 1, 100)));              
                 Combo.AddItem(new MenuItem("ignite", "Use Ignite").SetValue(true));
                 Combo.AddItem(new MenuItem("ComboActive", "Active").SetValue(new KeyBind(32, KeyBindType.Press)));
 

@@ -74,7 +74,7 @@ namespace OnlyMorgana
                     HeroName = "Alistar",
                     SpellMenuName = "Headbutt",
                     Slot = SpellSlot.W,
-                    Type = Skilltype.Unknown,
+                    Type = Skilltype.Circle,
                     SDataName = "Headbutt",
                     DangerLevel = 3
                 });
@@ -123,7 +123,7 @@ namespace OnlyMorgana
                 {
                     HeroName = "Annie",
                     SpellMenuName = "Tibbers",
-                    Slot = SpellSlot.Q,
+                    Slot = SpellSlot.R,
                     Type = Skilltype.Circle,
                     SDataName = "InfernalGuardian",
                     DangerLevel = 5
@@ -337,7 +337,7 @@ namespace OnlyMorgana
                     HeroName = "Galio",
                     SpellMenuName = "Idol Of Durand",
                     Slot = SpellSlot.R,
-                    Type = Skilltype.Circle,
+                    Type = Skilltype.Unknown,
                     DangerLevel = 5,
                     SDataName = "GalioIdolOfDurand",
                 });
@@ -820,6 +820,16 @@ namespace OnlyMorgana
             CCList.Add(
                 new SpellList
                 {
+                    HeroName = "Nasus",
+                    SpellMenuName = "Nasus W",
+                    Slot = SpellSlot.W,
+                    Type = Skilltype.Circle,
+                    DangerLevel = 3,
+                    SDataName = "NasusW",
+                });
+            CCList.Add(
+                new SpellList
+                {
                     HeroName = "Nautilus",
                     SpellMenuName = "Dredge Line",
                     Slot = SpellSlot.Q,
@@ -973,6 +983,7 @@ namespace OnlyMorgana
                     HeroName = "Ryze",
                     SpellMenuName = "Rune Prision",
                     Slot = SpellSlot.W,
+                    Type = Skilltype.Circle,
                     DangerLevel = 3,
                     SDataName = "RunePrison",
                 });
@@ -1342,7 +1353,7 @@ namespace OnlyMorgana
                      HeroName = "XinZhao",
                      SpellMenuName = "Audacious Charge",
                      Slot = SpellSlot.E,
-                     Type = Skilltype.Unknown,
+                     Type = Skilltype.Circle,
                      DangerLevel = 4,
                      SDataName = "XenZhaoSweep",
                  });
