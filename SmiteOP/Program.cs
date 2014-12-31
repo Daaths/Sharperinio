@@ -74,7 +74,7 @@ namespace SmiteOP
             {
                 if (enemy.Health <= dmg)
                 {
-                    Game.PrintChat("KAPPA");
+                    //Game.PrintChat("KAPPA");
                     SmiteSlot.Slot = smiteSlot;
                     Player.Spellbook.CastSpell(smiteSlot, enemy);
                 }
