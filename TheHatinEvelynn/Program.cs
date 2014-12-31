@@ -16,8 +16,6 @@ namespace TheHatinEvelynn
     {
         public static string ChampionName = "Evelynn";
         public static Orbwalking.Orbwalker Orbwalker;
-        public static Dictionary<string, int> numSkins = new Dictionary<string, int>();
-        public static int currSkinId = 0;
         private static int kappa;
         public static string WelcomeMsg = ("<font color = '#6600cc'>TheHatin' Evelynn </font><font color='#FFFFFF'>by Da'ath.</font> <font color = '#66ff33'> ~~ LOADED ~~</font> ");
         private static Obj_AI_Hero Player;
@@ -58,16 +56,15 @@ namespace TheHatinEvelynn
         {
             Player = ObjectManager.Player;
             if (Player.BaseSkinName != ChampionName) return;
-            numSkins.Add("Evelynn", 4);
             Game.PrintChat(WelcomeMsg);
 
             //Create the spells
             #region
-            Q = new Spell(SpellSlot.Q, 700f);
+            Q = new Spell(SpellSlot.Q, 500f);
             W = new Spell(SpellSlot.W, 0);
-            E = new Spell(SpellSlot.E, 225f);
-            R = new Spell(SpellSlot.R, 650f);
-            R.SetSkillshot(0.25f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            E = new Spell(SpellSlot.E, 250f);
+            R = new Spell(SpellSlot.R, 625f);
+            R.SetSkillshot(0.25f, 500f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             SpellList.Add(Q);
             SpellList.Add(W);
@@ -174,17 +171,6 @@ namespace TheHatinEvelynn
             Menu.AddSubMenu(new Menu("Misc", "Misc"));
             Menu.SubMenu("Misc").AddItem(new MenuItem("UsePackets", "Use Packets").SetValue(true));
             Menu.SubMenu("Misc").AddItem(new MenuItem("SmartW", "Smart W").SetValue(true));
-            var ChangeSkin = Menu.SubMenu("Misc").AddItem(new MenuItem("Skin", "Change the skin").SetValue(true));
-            ChangeSkin.ValueChanged += delegate(object sender, OnValueChangeEventArgs EventArgs)
-            {
-                if (numSkins[ObjectManager.Player.ChampionName] > currSkinId)
-                    currSkinId++;
-                else
-                    currSkinId = 0;
-
-                GenerateSkinPacket(ObjectManager.Player.ChampionName, currSkinId);
-            };
-
             Menu.SubMenu("Misc").AddSubMenu(new Menu("Smart Quicksilver Sash", "SQS"));
             Menu.SubMenu("Misc").SubMenu("SQS").AddItem(new MenuItem("ActiveQSS", "Active").SetValue(true));
             Menu.SubMenu("Misc").SubMenu("SQS").AddItem(new MenuItem("Quick%Poison", "On % HP when poisoned").SetValue(new Slider(10, 1, 100)));
@@ -254,21 +240,21 @@ namespace TheHatinEvelynn
             if (target != null)
             {
                
-                if (ObjectManager.Player.Distance(target, true) <= DFG.Range && DFG.IsReady() && Menu.Item("UseDFGItems").GetValue<bool>() && target.Health < GetComboDamage(target) && target.IsValidTarget(DFG.Range))
+                if (ObjectManager.Player.Distance(target, false) <= DFG.Range && DFG.IsReady() && Menu.Item("UseDFGItems").GetValue<bool>() && target.Health < GetComboDamage(target) && target.IsValidTarget(DFG.Range))
                     DFG.Cast(target);
-                if (ObjectManager.Player.Distance(target, true) <= Cutlass.Range && Cutlass.IsReady() && Menu.Item("UseCutlassItems").GetValue<bool>() && target.IsValidTarget(Cutlass.Range))
+                if (ObjectManager.Player.Distance(target, false) <= Cutlass.Range && Cutlass.IsReady() && Menu.Item("UseCutlassItems").GetValue<bool>() && target.IsValidTarget(Cutlass.Range))
                     Cutlass.Cast(target);
-                if (ObjectManager.Player.Distance(target, true) <= BotRK.Range && BotRK.IsReady() && Menu.Item("UseBotRKItems").GetValue<bool>() && target.IsValidTarget(BotRK.Range)) 
+                if (ObjectManager.Player.Distance(target, false) <= BotRK.Range && BotRK.IsReady() && Menu.Item("UseBotRKItems").GetValue<bool>() && target.IsValidTarget(BotRK.Range)) 
                     BotRK.Cast(target);
-                if (ObjectManager.Player.Distance(target, true) <= HexGunBlade.Range && HexGunBlade.IsReady() && Menu.Item("UseHexGunBladeItems").GetValue<bool>() && target.IsValidTarget(HexGunBlade.Range))
+                if (ObjectManager.Player.Distance(target, false) <= HexGunBlade.Range && HexGunBlade.IsReady() && Menu.Item("UseHexGunBladeItems").GetValue<bool>() && target.IsValidTarget(HexGunBlade.Range))
                     HexGunBlade.Cast(target);
 
 
-                if (ObjectManager.Player.Distance(target, true) < Q.Range && Q.IsReady() && Menu.Item("UseQCombo").GetValue<bool>() && target.IsValidTarget(Q.Range))
+                if (ObjectManager.Player.Distance(target, false) < Q.Range && Q.IsReady() && Menu.Item("UseQCombo").GetValue<bool>() && target.IsValidTarget(Q.Range))
                     Q.Cast(Menu.Item("UsePackets").GetValue<bool>());
-                if (ObjectManager.Player.Distance(target, true) < E.Range && E.IsReady() && Menu.Item("UseECombo").GetValue<bool>() && target.IsValidTarget(E.Range))
+                if (ObjectManager.Player.Distance(target, false) < E.Range && E.IsReady() && Menu.Item("UseECombo").GetValue<bool>() && target.IsValidTarget(E.Range))
                     E.CastOnUnit(target, Menu.Item("UsePackets").GetValue<bool>());
-                if (ObjectManager.Player.Distance(target, true) < R.Range && R.IsReady() && target.Health < GetComboDamage(target) && Menu.Item("UseRCombo").GetValue<bool>() && target.IsValidTarget(R.Range))
+                if (ObjectManager.Player.Distance(target, false) < R.Range && R.IsReady() && target.Health < GetComboDamage(target) && Menu.Item("UseRCombo").GetValue<bool>() && target.IsValidTarget(R.Range))
                     R.CastIfHitchanceEquals(target, HitChance.High, Menu.Item("UsePackets").GetValue<bool>());
                 if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Menu.Item("UseIgniteCombo").GetValue<bool>())
                     if (target.Health < GetComboDamage(target))
@@ -280,9 +266,10 @@ namespace TheHatinEvelynn
         }
         private static void LaneClear()
         {
-
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range,
                 MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
+            if (minions == null)
+                return;
 
             foreach (var minion in minions.Where(minion => minion.IsValidTarget(Q.Range)))
             {
@@ -308,6 +295,7 @@ namespace TheHatinEvelynn
 
         private static void JungleFarm()
         {
+
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             Obj_AI_Base mob = GetNearest(ObjectManager.Player.ServerPosition);
             double smitedamage = smiteDamage();
@@ -406,14 +394,6 @@ namespace TheHatinEvelynn
            
 
         }
-        public static void GenerateSkinPacket(string currentChampion, int skinNumber)
-        {
-            int netID = ObjectManager.Player.NetworkId;
-            GamePacket model = Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(ObjectManager.Player.NetworkId, skinNumber, currentChampion));
-            model.Process(PacketChannel.S2C);
-        }
-
-
         private static readonly string[] MinionNames = { 
               "TT_Spiderboss", "TTNGolem", "TTNWolf", "TTNWraith", 
               "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", 
