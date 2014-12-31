@@ -336,7 +336,7 @@ namespace OnlyMorgana
             {
                 if (Menu.Item("qHarass").GetValue<bool>() && Q.IsReady() && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh)
                 {
-                    Game.PrintChat("q harass");
+                    //Game.PrintChat("q harass");
                     Q.CastIfHitchanceEquals(target, HitChance.VeryHigh, Packets());
                 }
             }
